@@ -1,6 +1,5 @@
 import { getKeypairFromEnvironment } from "@solana-developers/helpers";
 import "dotenv/config";
-import bs58 from "bs58";
 
 const keypair = getKeypairFromEnvironment("SECRET_KEY");
 
