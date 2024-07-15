@@ -25,7 +25,7 @@ const tokenAccount = await getOrCreateAssociatedTokenAccount(
   connection,
   user,
   tokenMintAccount,
-  recipient
+  recipient // owner
 );
 
 const link = getExplorerLink(

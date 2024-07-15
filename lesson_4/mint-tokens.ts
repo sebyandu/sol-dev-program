@@ -2,17 +2,11 @@
 import { getExplorerLink, getKeypairFromEnvironment } from "@solana-developers/helpers";
 import {
   Connection,
-  LAMPORTS_PER_SOL,
   PublicKey,
-  SystemProgram,
-  Transaction,
-  TransactionInstruction,
   clusterApiUrl,
-  sendAndConfirmTransaction,
 } from "@solana/web3.js";
-import { createMemoInstruction } from "@solana/spl-memo";
 import "dotenv/config";
-import { TOKEN_PROGRAM_ID, createMint, getOrCreateAssociatedTokenAccount, mintTo } from "@solana/spl-token";
+import { getOrCreateAssociatedTokenAccount, mintTo } from "@solana/spl-token";
 
 
 const connection = new Connection(clusterApiUrl("devnet"), "confirmed");
