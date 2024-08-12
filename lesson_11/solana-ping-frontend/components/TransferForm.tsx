@@ -22,9 +22,19 @@ const TransferForm = () => {
     "Ah9K7dQ8EHaZqcAsgBW8w37yN2eAy3koFmUn4x3CJtod"
   );
   const [amount, setAmount] = useState<string>("0.1");
+  const [transactionSignature, setTransactionSignature] = useState<
+    string | null
+  >(null);
   const [transactionStatus, setTransactionStatus] = useState<string | null>(
     null
   );
+  const getSolanaExplorerLink = (
+    linkType: "tx" | "address",
+    id: string,
+    cluster: "devnet" | "mainnet-beta" = "mainnet-beta"
+  ) => {
+    return `https://explorer.solana.com/${linkType}/${id}?cluster=${cluster}`;
+  };
   const isConnected = useWalletConnection();
   useEffect(() => {
     const getBalance = async () => {
@@ -64,6 +74,7 @@ const TransferForm = () => {
 
       setTransactionStatus("Sending transaction...");
       const signature = await sendTransaction(transaction, connection);
+      setTransactionSignature(signature);
       const latestBlockhash = await connection.getLatestBlockhash();
       setTransactionStatus("Transaction sent. Waiting for confirmation...");
 
@@ -82,37 +93,66 @@ const TransferForm = () => {
     }
   };
 
+  const explorerUrl = transactionSignature
+    ? getSolanaExplorerLink("tx", transactionSignature, "devnet")
+    : "";
+
   return (
-    <div style={{ textAlign: "center", maxWidth: "400px", margin: "0 auto" }}>
-      <h2>Wallet-Adapter Example</h2>
-      {publicKey && (
+    <>
+      <div style={{ textAlign: "center", maxWidth: "400px", margin: "0 auto" }}>
+        <h2>Wallet-Adapter Example</h2>
+        {publicKey && (
+          <div style={{ marginBottom: "20px" }}>
+            <p style={{ fontSize: "1.5rem" }}>
+              Balance: {balance !== null ? balance.toFixed(6) : "Loading..."}{" "}
+              SOL
+            </p>
+          </div>
+        )}
         <div style={{ marginBottom: "20px" }}>
-          <p style={{ fontSize: "1.5rem" }}>
-            Balance: {balance !== null ? balance.toFixed(6) : "Loading..."} SOL
-          </p>
+          <BaseInput
+            type="text"
+            placeholder="Amount (in SOL) to send:"
+            value={amount}
+            onChange={(e) => setAmount(e.target.value)}
+          />
         </div>
+        <div style={{ marginBottom: "20px" }}>
+          <BaseInput
+            type="text"
+            placeholder="Send SOL to:"
+            value={toAddress}
+            onChange={(e) => setToAddress(e.target.value)}
+          />
+        </div>
+        <div className={styles.buttonContainer}>
+          <BaseButton onClick={sendTransactionHandler}>Send</BaseButton>
+        </div>
+      </div>
+      {transactionStatus && (
+        <p
+          style={{
+            textAlign: "center",
+            maxWidth: "700px",
+            margin: "0 auto",
+            fontSize: "0.8rem",
+          }}
+        >
+          {transactionSignature ? (
+            <a
+              href={explorerUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              style={{ color: "white" }}
+            >
+              {transactionStatus} - View on Solana Explorer
+            </a>
+          ) : (
+            transactionStatus
+          )}
+        </p>
       )}
-      <div style={{ marginBottom: "20px" }}>
-        <BaseInput
-          type="text"
-          placeholder="Amount (in SOL) to send:"
-          value={amount}
-          onChange={(e) => setAmount(e.target.value)}
-        />
-      </div>
-      <div style={{ marginBottom: "20px" }}>
-        <BaseInput
-          type="text"
-          placeholder="Send SOL to:"
-          value={toAddress}
-          onChange={(e) => setToAddress(e.target.value)}
-        />
-      </div>
-      <div className={styles.buttonContainer}>
-        <BaseButton onClick={sendTransactionHandler}>Send</BaseButton>
-      </div>
-      {transactionStatus && <p>{transactionStatus}</p>}
-    </div>
+    </>
   );
 };
 
